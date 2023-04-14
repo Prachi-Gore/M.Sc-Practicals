@@ -1,0 +1,41 @@
+clc;close all;clear all;
+y=[570 565  1063 1080 1043 565   ...
+   528 547 521 988 526 538   ...
+  610 592 026 1004 510 590 532]';
+F_A=[1 1 1 1 1 1   ...
+     2 2 2 2 2 2   ...     
+   3 3 3 3 3 3 3]';
+F_B=[1 1 2 2 2 3   ...
+     1 1 1 2 3 3   ....     
+     1 1 2 2 3 3 3 ]';
+del=dummyvar(F_A);
+dd=dummyvar(F_B);
+N=del'*dd;[v b]=size(N);
+n=length(y);
+R=del'*del;
+K=dd'*dd;
+G=sum(y);
+T=del'*y;
+B=dd'*y;
+Q=T-N*inv(K)*B;C=R-N*inv(K)*N';%..rank(C)..%
+to_hat=pinv(C)*Q;
+SSt_adj=to_hat'*Q;
+SSb_unadj=B'*inv(K)*B-(G^2/n);
+SS_total=y'*y-G^2/n;
+SSE=SS_total-SSt_adj-SSb_unadj;
+MSt_adj=SSt_adj/(v-1);
+MSb_unadj=SSb_unadj/(b-1);
+MSE=SSE/(n-v-b+1);
+Ft_adj=MSt_adj/MSE;
+Fb_unadj=MSb_unadj/MSE;
+Pt_adj=1-fcdf(Ft_adj,v-1,n-v-b+1);
+Pb_unadj=1-fcdf(Fb_unadj,b-1,n-v-b+1);
+
+ANOVA=['Treat'  v-1 SSt_adj	MSt_adj Ft_adj+Pt_adj
+       'Block'+' '+b-1+' '+SSb_unadj+' '+MSb_unadj+Fb_unadj+Pb_unadj];
+format short g;    
+disp(ANOVA) 
+   
+
+
+
